@@ -15,74 +15,9 @@ export class ImageCropper extends ImageCropperModel {
     private cropperSettings:CropperSettings;
     private previousDistance:number;
 
-    constructor(cropperSettings:CropperSettings) {
-        super();
-
-        let x:number = 0;
-        let y:number = 0;
-        let width:number = cropperSettings.width;
-        let height:number = cropperSettings.height;
-        let keepAspect:boolean = cropperSettings.keepAspect;
-        let touchRadius:number = cropperSettings.touchRadius;
-        let centerTouchRadius:number = cropperSettings.centerTouchRadius;
-        let minWidth:number = cropperSettings.minWidth;
-        let minHeight:number = cropperSettings.minHeight;
-        let croppedWidth:number = cropperSettings.croppedWidth;
-        let croppedHeight:number = cropperSettings.croppedHeight;
-
-        this.cropperSettings = cropperSettings;
-
-        this.crop = this;
-        this.x = x;
-        this.y = y;
-
-        if (width === void 0) {
-            this.width = 100;
-        }
-        if (height === void 0) {
-            this.height = 50;
-        }
-        if (keepAspect === void 0) {
-            this.keepAspect = true;
-        }
-        if (touchRadius === void 0) {
-            this.touchRadius = 20;
-        }
-        this.minWidth = minWidth;
-        this.minHeight = minHeight;
-        this.keepAspect = false;
-        this.aspectRatio = 0;
-        this.currentDragTouches = [];
-        this.isMouseDown = false;
-        this.ratioW = 1;
-        this.ratioH = 1;
-        this.fileType = cropperSettings.fileType;
-        this.imageSet = false;
-        this.pointPool = new PointPool(200);
-
-        this.tl = new CornerMarker(x, y, touchRadius, this.cropperSettings);
-        this.tr = new CornerMarker(x + width, y, touchRadius, this.cropperSettings);
-        this.bl = new CornerMarker(x, y + height, touchRadius, this.cropperSettings);
-        this.br = new CornerMarker(x + width, y + height, touchRadius, this.cropperSettings);
-
-        this.tl.addHorizontalNeighbour(this.tr);
-        this.tl.addVerticalNeighbour(this.bl);
-        this.tr.addHorizontalNeighbour(this.tl);
-        this.tr.addVerticalNeighbour(this.br);
-        this.bl.addHorizontalNeighbour(this.br);
-        this.bl.addVerticalNeighbour(this.tl);
-        this.br.addHorizontalNeighbour(this.bl);
-        this.br.addVerticalNeighbour(this.tr);
-        this.markers = [this.tl, this.tr, this.bl, this.br];
-
-
-        this.center = new DragMarker(x + (width / 2), y + (height / 2), centerTouchRadius, this.cropperSettings);
-        this.keepAspect = keepAspect;
-        this.aspectRatio = height / width;
-        this.croppedImage = new Image();
-        this.currentlyInteracting = false;
-        this.cropWidth = croppedWidth;
-        this.cropHeight = croppedHeight;
+    constructor(cropperSettings: CropperSettings) {
+      super();
+      this.initialise(cropperSettings);
     }
 
     private static sign(x:number):number {
@@ -173,7 +108,8 @@ export class ImageCropper extends ImageCropperModel {
     }
 
     public updateSettings(cropperSettings: CropperSettings) {
-      this.cropperSettings = cropperSettings;
+        this.cropperSettings = cropperSettings;
+        this.initialise(cropperSettings);
     }
 
     public resizeCanvas(width:number, height:number, setImage:boolean = false):void {
@@ -665,6 +601,74 @@ export class ImageCropper extends ImageCropperModel {
     public updateCropPosition(cropBounds:Bounds):void {
         let cropPosition:Point[] = this.getCropPositionFromBounds(cropBounds);
         this.setCropPosition(cropPosition);
+    }
+
+    private initialise(cropperSettings: CropperSettings) {
+        let x:number = 0;
+        let y:number = 0;
+        let width:number = cropperSettings.width;
+        let height:number = cropperSettings.height;
+        let keepAspect:boolean = cropperSettings.keepAspect;
+        let touchRadius:number = cropperSettings.touchRadius;
+        let centerTouchRadius:number = cropperSettings.centerTouchRadius;
+        let minWidth:number = cropperSettings.minWidth;
+        let minHeight:number = cropperSettings.minHeight;
+        let croppedWidth:number = cropperSettings.croppedWidth;
+        let croppedHeight:number = cropperSettings.croppedHeight;
+
+        this.cropperSettings = cropperSettings;
+
+        this.crop = this;
+        this.x = x;
+        this.y = y;
+
+        if (width === void 0) {
+            this.width = 100;
+        }
+        if (height === void 0) {
+            this.height = 50;
+        }
+        if (keepAspect === void 0) {
+            this.keepAspect = true;
+        }
+        if (touchRadius === void 0) {
+            this.touchRadius = 20;
+        }
+        this.minWidth = minWidth;
+        this.minHeight = minHeight;
+        this.keepAspect = false;
+        this.aspectRatio = 0;
+        this.currentDragTouches = [];
+        this.isMouseDown = false;
+        this.ratioW = 1;
+        this.ratioH = 1;
+        this.fileType = cropperSettings.fileType;
+        this.imageSet = false;
+        this.pointPool = new PointPool(200);
+
+        this.tl = new CornerMarker(x, y, touchRadius, this.cropperSettings);
+        this.tr = new CornerMarker(x + width, y, touchRadius, this.cropperSettings);
+        this.bl = new CornerMarker(x, y + height, touchRadius, this.cropperSettings);
+        this.br = new CornerMarker(x + width, y + height, touchRadius, this.cropperSettings);
+
+        this.tl.addHorizontalNeighbour(this.tr);
+        this.tl.addVerticalNeighbour(this.bl);
+        this.tr.addHorizontalNeighbour(this.tl);
+        this.tr.addVerticalNeighbour(this.br);
+        this.bl.addHorizontalNeighbour(this.br);
+        this.bl.addVerticalNeighbour(this.tl);
+        this.br.addHorizontalNeighbour(this.bl);
+        this.br.addVerticalNeighbour(this.tr);
+        this.markers = [this.tl, this.tr, this.bl, this.br];
+
+
+        this.center = new DragMarker(x + (width / 2), y + (height / 2), centerTouchRadius, this.cropperSettings);
+        this.keepAspect = keepAspect;
+        this.aspectRatio = height / width;
+        this.croppedImage = new Image();
+        this.currentlyInteracting = false;
+        this.cropWidth = croppedWidth;
+        this.cropHeight = croppedHeight;
     }
 
     private setCropPosition(cropPosition:Point[]):void {
